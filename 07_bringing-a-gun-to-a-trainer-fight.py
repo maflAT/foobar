@@ -61,8 +61,6 @@ solution.solution([300,275], [150,150], [185,100], 500)
 Output:
     9
 """
-from math import ceil, sqrt
-
 
 def solution(dimensions, player_position, target_position, beam_range):
     WIDTH = dimensions[0]
@@ -84,7 +82,7 @@ def solution(dimensions, player_position, target_position, beam_range):
         targets.add(normalize(TARGET_X, TARGET_Y))
 
     # Tier 1 to max beam range
-    max_tier = int(ceil(float(beam_range) / min(WIDTH, HEIGHT)))
+    max_tier = int(ceil(float(beam_range) / min(WIDTH, HEIGHT)) + 1)
     for tier in range(1, max_tier):
         for tile in tiles_in_tier(tier):
             # calculate x coordinates relative to player
@@ -190,7 +188,10 @@ def prime_lut(n):
             if lut[j] == j: lut[j] = i
     return lut
 
+
+from math import ceil, sqrt
 PRIMES = prime_lut(10000 + 1250)
 
 if __name__ == '__main__':
+    # test: (should be 9)
     print(solution([300,275], [150,150], [185,100], 500))
