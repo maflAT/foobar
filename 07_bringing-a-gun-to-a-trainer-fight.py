@@ -61,21 +61,15 @@ solution.solution([300,275], [150,150], [185,100], 500)
 Output:
     9
 """
-from math import sqrt
-from pprint import pprint
+from math import ceil, sqrt
+
 
 def solution(dimensions, player_position, target_position, beam_range):
     WIDTH = dimensions[0]
     HEIGHT = dimensions[1]
     RANGE2 = beam_range ** 2
-    # TILES_X = range(-ceil(beam_range / WIDTH), ceil(beam_range / WIDTH))
-    # TILES_Y = range(-ceil(beam_range / HEIGHT), ceil(beam_range / HEIGHT))
 
     # center coordinates on player:
-    WESTWALL = -player_position[0]
-    EASTWALL = dimensions[0] - player_position[0]
-    NORTHWALL = -player_position[1]
-    SOUTHWALL = dimensions[1] - player_position[1]
     TARGET_X = target_position[0] - player_position[0]
     TARGET_Y = target_position[1] - player_position[1]
     PLAYER_MIRROR_X = WIDTH - 2 * player_position[0]
@@ -84,43 +78,64 @@ def solution(dimensions, player_position, target_position, beam_range):
     TARGET_MIRROR_Y = HEIGHT - 2 * target_position[1]
 
     # Tier 0: current room
-    players = []
-    targets = []
+    players = set()
+    targets = set()
     if TARGET_X ** 2 + TARGET_Y ** 2 <= RANGE2:
-        targets.append((TARGET_X, TARGET_Y))
+        targets.add(normalize(TARGET_X, TARGET_Y))
 
-    # Tier 1: first mirrored layer around room
-    for tier in range(1, 3):
+    # Tier 1 to max beam range
+    max_tier = int(ceil(float(beam_range) / min(WIDTH, HEIGHT)))
+    for tier in range(1, max_tier):
         for tile in tiles_in_tier(tier):
-            if tile[0] % 2 == 0:
-                player_x = tile[0] * WIDTH
-                target_x = tile[0] * WIDTH + TARGET_X
+            # calculate x coordinates relative to player
+            player_x = tile[0] * WIDTH
+            target_x = player_x + TARGET_X
+            if tile[0] % 2 != 0:
+                # if tile x coordinate is odd, positions are mirrored
+                player_x += PLAYER_MIRROR_X
+                target_x += TARGET_MIRROR_X
+            # calculate y coordinates
+            player_y = tile[1] * HEIGHT
+            target_y = player_y + TARGET_Y
+            if tile[1] % 2 != 0:
+                # if tile y coordinate is odd, positions are mirrored
+                player_y += PLAYER_MIRROR_Y
+                target_y += TARGET_MIRROR_Y
+            # check max range
+            player_distance = player_x ** 2 + player_y ** 2
+            target_distance = target_x ** 2 + target_y ** 2
+            # if both player and target are out or range abort early
+            if player_distance > RANGE2 and target_distance > RANGE2: continue
+            # otherwise calculate normalized vectors for player and target
+            player_vector = normalize(player_x, player_y)
+            target_vector = normalize(target_x, target_y)
+            # entity closest to the origin will be handled first
+            if target_distance < player_distance:
+                if target_vector not in players:
+                    targets.add(target_vector)
+                if player_vector not in targets and player_distance <= RANGE2:
+                    players.add(player_vector)
             else:
-                player_x = tile[0] * WIDTH + PLAYER_MIRROR_X
-                target_x = tile[0] * WIDTH + TARGET_MIRROR_X + TARGET_X
-            if tile[1] % 2 == 0:
-                player_y = tile[1] * HEIGHT
-                target_y = tile[1] * HEIGHT + TARGET_Y
-            else:
-                player_y = tile[1] * HEIGHT + PLAYER_MIRROR_Y
-                target_y = tile[1] * HEIGHT + TARGET_MIRROR_Y + TARGET_Y
-            if player_x ** 2 + player_y ** 2 <= RANGE2:
-                players.append((player_x, player_y))
-            targets.append((target_x, target_y))
-
-    pprint(players)
-    pprint(targets)
+                if player_vector not in targets:
+                    players.add(player_vector)
+                if target_vector not in players and target_distance <= RANGE2:
+                    targets.add(target_vector)
+    
+    # diagnostic output:
+    # print(f'{players = }')
+    # print(f'{targets = }')
+    return len(targets)
 
 
-def tiles_in_tier(tier: int):
+def tiles_in_tier(tier):
     if not isinstance(tier, int): raise TypeError("tier must be a positive integer")
     if tier < 0: raise ValueError("tier must be a positive integer")
     if tier == 0: return [(int(0), int(0))]
-    # generate tiles is first 8th of circle (0° < phi < 45°)
+    # generate tiles is first 8th of circle (0 < phi < 45)
     tiles = [(tier, i) for i in range(1, tier)]
-    # add tiles between 45° and 90°
+    # add tiles between 45 and 90
     tiles += [(y, x) for x, y in tiles]
-    # add tile at 45°
+    # add tile at 45
     tiles += [(tier, tier)]
     # add second quarter
     tiles += [(-x, y) for x, y in tiles]
@@ -130,9 +145,15 @@ def tiles_in_tier(tier: int):
     tiles += [(tier, 0), (0, tier), (-tier, 0), (0, -tier)]
     return tiles
 
-def normalize(x: int, y: int):
+
+def normalize(x, y):
     """Find the greatest common factor between x and y and apply it to both.
     The sign of both numbers will be preserved."""
+    if x == 0 and y == 0:
+        raise ValueError("Can't normalize vector of length 0")
+    # catch edge cases where x or y == 0
+    if x == 0: return int(x), int(-1 if y < 0 else 1)
+    if y == 0: return int(-1 if x < 0 else 1), int(y)
     # find prime factors of x and y
     fx, fy = factorize(abs(x)), factorize(abs(y))
     # use the shorter of the 2 lists to search common factors in both lists
@@ -143,8 +164,10 @@ def normalize(x: int, y: int):
             gcf *= factor
             longer.remove(factor)
     return int(x / gcf), int(y / gcf)
+    
 
-def factorize(n: int):
+def factorize(n):
+    """split n into prime factors using the generated 'PRIMES' lookup table"""
     if not isinstance(n, int): raise TypeError("n must be a positive integer")
     if n < 1: raise ValueError("n must be a positive integer")
     factors = []
@@ -153,7 +176,8 @@ def factorize(n: int):
         n //= PRIMES[n]
     return factors
 
-def prime_lut(n: int):
+
+def prime_lut(n):
     """build lookup table for the smallest prime factor of each number up to n"""
     if not isinstance(n, int): raise TypeError("n must be a positive integer")
     if n < 1: raise ValueError("n must be a positive integer")
@@ -168,37 +192,5 @@ def prime_lut(n: int):
 
 PRIMES = prime_lut(10000 + 1250)
 
-solution([3,2], [1,1], [2,1], 4)
-
-    # room = {
-    #     'width': dimensions[0],
-    #     'height': dimensions[1],
-    #     'player': Player(player_position[0], player_position[1]),
-    #     'target': Target(target_position[0], target_position[1]),
-
-    # }
-# Project rooms (trainer and player locations) in each direction 
-
-# Mirror x-coordinates for each iteration in x-direction
-
-# Mirror y-coordinates for each iteration in y-direction
-
-# Stop if distance to trainer exceeds maximum beam distance
-
-# check against known target vectors
-
-# check against known trainer vectors
-
-# add normalized target vector to results
-
-# add normalized player vector to results
-
-# class Room(object):
-#     def __init__(self, dimensions, player_pos, target_pos) -> None:
-#         self.width = dimensions[0]
-#         self.heigth = dimensions[1]
-#         self.player = player_pos
-#         self.target = target_pos
-
-#     def project(direction):
-
+if __name__ == '__main__':
+    print(solution([300,275], [150,150], [185,100], 500))
