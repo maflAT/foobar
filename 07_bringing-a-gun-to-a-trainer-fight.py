@@ -112,18 +112,6 @@ def solution(dimensions, player_position, target_position, beam_range):
     pprint(targets)
 
 
-def factorize(n: int):
-    if not isinstance(n, int): raise TypeError("n must be a positive integer")
-    if n < 1: raise ValueError("n must be a positive integer")
-    factors = []
-    while n > 1:
-        for prime in PRIMES:
-            if n % prime == 0:
-                factors.append(prime)
-                n //= prime
-                break
-    return factors
-
 def tiles_in_tier(tier: int):
     if not isinstance(tier, int): raise TypeError("tier must be a positive integer")
     if tier < 0: raise ValueError("tier must be a positive integer")
@@ -142,15 +130,40 @@ def tiles_in_tier(tier: int):
     tiles += [(tier, 0), (0, tier), (-tier, 0), (0, -tier)]
     return tiles
 
+def normalize(x: int, y: int):
+    """Find the greatest common factor between x and y and apply it to both.
+    The sign of both numbers will be preserved."""
+    # find prime factors of x and y
+    fx, fy = factorize(abs(x)), factorize(abs(y))
+    # use the shorter of the 2 lists to search common factors in both lists
+    shorter, longer = sorted([fx, fy], key=len)
+    gcf = 1             # greatest common factor
+    for factor in shorter:
+        if factor in longer:
+            gcf *= factor
+            longer.remove(factor)
+    return int(x / gcf), int(y / gcf)
+
+def factorize(n: int):
+    if not isinstance(n, int): raise TypeError("n must be a positive integer")
+    if n < 1: raise ValueError("n must be a positive integer")
+    factors = []
+    while n > 1:
+        factors.append(PRIMES[n])
+        n //= PRIMES[n]
+    return factors
+
 def prime_lut(n: int):
     """build lookup table for the smallest prime factor of each number up to n"""
     if not isinstance(n, int): raise TypeError("n must be a positive integer")
     if n < 1: raise ValueError("n must be a positive integer")
     lut = list(range(n + 1))
     for i in range(2, int(sqrt(n)) + 1):
-        if lut[i] != i: continue    # i is not prime so we can skip it
+        # if i is not a prime number, we can skip it
+        if lut[i] != i: continue
         for j in range(2 * i, len(lut), i):
-            if lut[j] == j: lut[j] = i # register i as smallest prime factor of j
+            # if no factors are registerd for j, register i as smallest factor
+            if lut[j] == j: lut[j] = i
     return lut
 
 PRIMES = prime_lut(10000 + 1250)
