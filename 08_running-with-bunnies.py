@@ -132,17 +132,28 @@ def traverse(time_left: int, bunnies: list[int]):
 def find_shortcuts(time_table: list[list[int]]):
     """check if there are shorter paths between 2 nodes going through other nodes"""
     from itertools import product
+    from pprint import pprint
     num_nodes = len(time_table)
     # table containing shortest times between nodes
     s_times = [[col for col in row] for row in time_table]
     # table containing each path with the shortest time
-    s_paths = [[dest for dest in range(num_nodes)] for _ in range(num_nodes)]
+    s_paths = [[[dest] for dest in range(num_nodes)] for _ in range(num_nodes)]
 
     for sc in range(num_nodes):
-        for x, y in product(range(len(time_table)), repeat=2):
+        for x, y in product(range(num_nodes), repeat=2):
+            if sc == x or sc == y: continue
             if s_times[x][y] > s_times[x][sc] + s_times[sc][y]:
                 s_times[x][y] = s_times[x][sc] + s_times[sc][y]
-                s_paths[x][y] = sc
+                s_paths[x][y].extend(s_paths[x][sc])
+        print(f'{sc = }')
+        pprint(s_times)
+        print()
+        pprint(s_paths)
+        print()
+    return s_times
 
-
-    pass
+def find_loops(time_table: list[list[int]]):
+    for y in range(len(time_table)):
+        for x in range(y + 1):
+            if time_table[x][y] + time_table[y][x] < 0: 
+                return True
