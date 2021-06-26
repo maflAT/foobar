@@ -93,67 +93,79 @@ Output:
     [0, 1]
 """
 
-TIME_TABLE = []
+def test():
+    return solution([[0, 2, 2, 2, -1], 
+                     [9, 0, 2, 2, -1], 
+                     [9, 3, 0, 2, -1], 
+                     [9, 3, 2, 0, -1], 
+                     [9, 3, 2, 2, 0]], 1)
 
 def solution(times: list[list[int]], time_limit: int):
-    global TIME_TABLE
-    TIME_TABLE = times
+    global TIME_TABLE, ROUTES, NUM_NODES, BUNNIES
+    NUM_NODES = len(times)
+    TIME_TABLE, ROUTES = find_shortcuts(times)
+    BUNNIES = list(range(1, NUM_NODES - 1))
+    if find_loops(TIME_TABLE): return [b - 1 for b in BUNNIES]
+    if TIME_TABLE[0][NUM_NODES - 1] > time_limit: return []
+    returned = traverse(cur_pos=0, time_left=time_limit, bunnies=[])
+    if returned == False: return []
+    return [b - 1 for b in BUNNIES]
 
-    pass
-
-def traverse(time_left: int, bunnies: list[int]):
+def traverse(cur_pos: int, time_left: int, bunnies: list[int]):
+    # if if time to bulkhead > time left: return false
+    if TIME_TABLE[cur_pos][NUM_NODES - 1] > time_left: return False
     # if all bunnies collected and time to bulkhead <= time left: done (return bunnies)
-    if len(bunnies) == len(TIME_TABLE) - 2: 
-        if TIME_TABLE[bunnies[-1]][-1] <= time_left: return bunnies
+    if cur_pos in BUNNIES and cur_pos not in bunnies:
+        bunnies.append(cur_pos)
+        bunnies.sort()
+        print(f'{bunnies = }')
+    if bunnies == BUNNIES: return bunnies
 
-    # if all bunnies collected and time to bulkhead > time left: return false
-        else: return False
-
-    # traverse to bunny with lowest id.
-    bunnies_left = [b for b in range(len(TIME_TABLE) - 2) if b not in bunnies]
+    # traverse to next bunny with lowest id
+    missing_bunnies = [b for b in BUNNIES if b not in bunnies]
     results = []
-    for b in bunnies_left:
-        returned = traverse(time_left - TIME_TABLE[bunnies[-1]][b], bunnies + [b])
-        # if all bunnies collected => done
-        if len(returned) == len(TIME_TABLE) - 2: return returned
+    for bunny in missing_bunnies:
+        next_pos = ROUTES[cur_pos][bunny]
+        returned = traverse(cur_pos=next_pos,
+                            time_left=time_left - TIME_TABLE[cur_pos][next_pos], 
+                            bunnies=bunnies)
+        # if traversal to current bunny failed, continue with next
         if returned == False: continue
-        # if not false remember returned bunny list
+        # if all bunnies collected => done
+        if returned == BUNNIES: return bunnies
+        # else remember returned bunny list
         results.append(returned)
     # if at least one bunny list returned successfully:
-    if len(results) > 0:
-            # return longest bunny list with lowest ids
-        return sorted(results, key=len)[-1]
-    # if all bunnies returned false:
-    # if time to bulkhead <= time left: return current bunny list + current position
-    if TIME_TABLE[bunnies[-1]][-1] <= time_left: return bunnies + [b]
-    # else if time to bulkhead > time left: return false
-    return False
+    # return longest bunny list with lowest ids
+    if len(results) > 0: return sorted(results, key=len)[-1]
+    # if all bunnies returned false: return current bunny list
+    return bunnies
 
 def find_shortcuts(time_table: list[list[int]]):
     """check if there are shorter paths between 2 nodes going through other nodes"""
     from itertools import product
-    from pprint import pprint
-    num_nodes = len(time_table)
     # table containing shortest times between nodes
-    s_times = [[col for col in row] for row in time_table]
+    times = [[col for col in row] for row in time_table]
     # table containing each path with the shortest time
-    s_paths = [[[dest] for dest in range(num_nodes)] for _ in range(num_nodes)]
+    routes = [[dest for dest in range(NUM_NODES)] for _ in range(NUM_NODES)]
 
-    for sc in range(num_nodes):
-        for x, y in product(range(num_nodes), repeat=2):
+    for sc in range(NUM_NODES):
+        for x, y in product(range(NUM_NODES), repeat=2):
             if sc == x or sc == y: continue
-            if s_times[x][y] > s_times[x][sc] + s_times[sc][y]:
-                s_times[x][y] = s_times[x][sc] + s_times[sc][y]
-                s_paths[x][y].extend(s_paths[x][sc])
-        print(f'{sc = }')
-        pprint(s_times)
-        print()
-        pprint(s_paths)
-        print()
-    return s_times
+            if times[x][y] > times[x][sc] + times[sc][y]:
+                times[x][y] = times[x][sc] + times[sc][y]
+                routes[x][y] = routes[x][sc]
+        # print(f'{sc = }')
+        # pprint(times)
+        # print()
+        # pprint(routes)
+        # print()
+    return times, routes
 
 def find_loops(time_table: list[list[int]]):
     for y in range(len(time_table)):
         for x in range(y + 1):
-            if time_table[x][y] + time_table[y][x] < 0: 
-                return True
+            if time_table[x][y] + time_table[y][x] < 0: return True
+
+
+test()
