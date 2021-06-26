@@ -101,13 +101,48 @@ def solution(times: list[list[int]], time_limit: int):
 
     pass
 
-def traverse(timetable: list[list[int]], time_limit: int):
+def traverse(time_left: int, bunnies: list[int]):
     # if all bunnies collected and time to bulkhead <= time left: done (return bunnies)
+    if len(bunnies) == len(TIME_TABLE) - 2: 
+        if TIME_TABLE[bunnies[-1]][-1] <= time_left: return bunnies
 
-    # if time to bulkhead <= time left: traverse to closest bunny
-        # if 
+    # if all bunnies collected and time to bulkhead > time left: return false
+        else: return False
 
+    # traverse to bunny with lowest id.
+    bunnies_left = [b for b in range(len(TIME_TABLE) - 2) if b not in bunnies]
+    results = []
+    for b in bunnies_left:
+        returned = traverse(time_left - TIME_TABLE[bunnies[-1]][b], bunnies + [b])
+        # if all bunnies collected => done
+        if len(returned) == len(TIME_TABLE) - 2: return returned
+        if returned == False: continue
+        # if not false remember returned bunny list
+        results.append(returned)
+    # if at least one bunny list returned successfully:
+    if len(results) > 0:
+            # return longest bunny list with lowest ids
+        return sorted(results, key=len)[-1]
+    # if all bunnies returned false:
+    # if time to bulkhead <= time left: return current bunny list + current position
+    if TIME_TABLE[bunnies[-1]][-1] <= time_left: return bunnies + [b]
+    # else if time to bulkhead > time left: return false
+    return False
 
+def find_shortcuts(time_table: list[list[int]]):
+    """check if there are shorter paths between 2 nodes going through other nodes"""
+    from itertools import product
+    num_nodes = len(time_table)
+    # table containing shortest times between nodes
+    s_times = [[col for col in row] for row in time_table]
+    # table containing each path with the shortest time
+    s_paths = [[dest for dest in range(num_nodes)] for _ in range(num_nodes)]
+
+    for sc in range(num_nodes):
+        for x, y in product(range(len(time_table)), repeat=2):
+            if s_times[x][y] > s_times[x][sc] + s_times[sc][y]:
+                s_times[x][y] = s_times[x][sc] + s_times[sc][y]
+                s_paths[x][y] = sc
 
 
     pass
