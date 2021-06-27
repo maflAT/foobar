@@ -93,18 +93,23 @@ Output:
     [0, 1]
 """
 
+from pprint import pprint
+
+
 def solution(times: list[list[int]], time_limit: int):
-    global TIMES, ROUTES, SIZE, BUNNIES
+    global TIMES, SIZE, BUNNIES
     SIZE = len(times)
-    TIMES, ROUTES = find_shortcuts(times)
+    TIMES = find_shortcuts(times)
+    print(f'time_table after calculating shortcuts:')
+    pprint(TIMES)
     BUNNIES = list(range(1, SIZE - 1))
     if find_loops(TIMES): return [b - 1 for b in BUNNIES]
     if TIMES[0][SIZE - 1] > time_limit: return []
-    bunnies = traverse(cur_pos=0, target=0, time_left=time_limit, bunnies=[])
+    bunnies = traverse(cur_pos=0, time_left=time_limit, bunnies=[])
     if bunnies == False: return []
     return [b - 1 for b in bunnies]
 
-def traverse(cur_pos: int, target:int, time_left: int, bunnies: list[int]):
+def traverse(cur_pos: int, time_left: int, bunnies: list[int]):
     """
     recursive function for traversing through nodes,
     keeping track of collected bunnies and remaining time
@@ -118,28 +123,20 @@ def traverse(cur_pos: int, target:int, time_left: int, bunnies: list[int]):
         bunnies.sort()
         print(f'{bunnies = }')
     # if current position is a shortcut node immediately traverse to next node
-    if cur_pos != target:
-        next_pos = ROUTES[cur_pos][target]
-        return traverse(cur_pos=next_pos,
-                        target=target,
-                        time_left=time_left - TIMES[cur_pos][next_pos],
-                        bunnies=bunnies[:])
     if bunnies == BUNNIES: return bunnies
     # traverse to next bunny with lowest id
     missing_bunnies = [b for b in BUNNIES if b not in bunnies]
     results = []
     for bunny in missing_bunnies:
-        next_pos = ROUTES[cur_pos][bunny]
-        returned = traverse(cur_pos=next_pos,
-                            target=bunny,
-                            time_left=time_left - TIMES[cur_pos][next_pos],
+        search_result = traverse(cur_pos=bunny,
+                            time_left=time_left - TIMES[cur_pos][bunny],
                             bunnies=bunnies[:])
         # if traversal to current bunny failed, continue with next
-        if returned == False: continue
+        if search_result == False: continue
         # if all bunnies collected => done
-        if returned == BUNNIES: return bunnies
+        if search_result == BUNNIES: return search_result
         # else remember returned bunny list
-        results.append(returned)
+        results.append(search_result)
     # if at least one bunny list returned successfully:
     # return longest bunny list with lowest ids
     if len(results) > 0:
@@ -154,21 +151,13 @@ def find_shortcuts(time_table: list[list[int]]):
     from itertools import product
     # table containing shortest times between nodes
     times = [[col for col in row] for row in time_table]
-    # table containing each path with the shortest time
-    routes = [[dest for dest in range(SIZE)] for _ in range(SIZE)]
 
     for sc in range(SIZE):
         for x, y in product(range(SIZE), repeat=2):
             if sc == x or sc == y: continue
             if times[x][y] > times[x][sc] + times[sc][y]:
                 times[x][y] = times[x][sc] + times[sc][y]
-                routes[x][y] = routes[x][sc]
-        # print(f'{sc = }')
-        # pprint(times)
-        # print()
-        # pprint(routes)
-        # print()
-    return times, routes
+    return times
 
 def find_loops(time_table: list[list[int]]):
     """check if there are any positive feedback loops, allowing for infinite time"""
@@ -178,7 +167,6 @@ def find_loops(time_table: list[list[int]]):
 
 
 def test(times, time_limit, result):
-    from pprint import pprint
     print(f'running test with {time_limit = } for matrix: ')
     pprint(times)
     print(f'{solution(times, time_limit)} = {result}\n')
@@ -356,4 +344,4 @@ test_cases = [
     ],
 ]
 
-for tst in test_cases[:4]: test(*tst)
+for tst in test_cases[:-2]: test(*tst)
