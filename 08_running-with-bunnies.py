@@ -2,46 +2,46 @@
 Running with Bunnies
 ====================
 
-You and the bunny workers need to get out of this collapsing death 
-trap of a space station -- and fast! Unfortunately, some of the 
-bunnies have been weakened by their long work shifts and can't 
-run very fast. Their friends are trying to help them, but this 
-escape would go a lot faster if you also pitched in. The defensive 
-bulkhead doors have begun to close, and if you don't make it 
-through in time, you'll be trapped! You need to grab as many 
-bunnies as you can and get through the bulkheads before they close. 
+You and the bunny workers need to get out of this collapsing death
+trap of a space station -- and fast! Unfortunately, some of the
+bunnies have been weakened by their long work shifts and can't
+run very fast. Their friends are trying to help them, but this
+escape would go a lot faster if you also pitched in. The defensive
+bulkhead doors have begun to close, and if you don't make it
+through in time, you'll be trapped! You need to grab as many
+bunnies as you can and get through the bulkheads before they close.
 
-The time it takes to move from your starting point to all of the 
-bunnies and to the bulkhead will be given to you in a square matrix 
-of integers. Each row will tell you the time it takes to get to the 
-start, first bunny, second bunny, ..., last bunny, and the bulkhead 
-in that order. The order of the rows follows the same pattern 
-(start, each bunny, bulkhead). The bunnies can jump into your arms, 
-so picking them up is instantaneous, and arriving at the bulkhead at 
-the same time as it seals still allows for a successful, if 
-dramatic, escape. (Don't worry, any bunnies you don't pick 
-up will be able to escape with you since they no longer have to 
-carry the ones you did pick up.) You can revisit different spots if 
-you wish, and moving to the bulkhead doesn't mean you have to 
-immediately leave -- you can move to and from the bulkhead to pick 
+The time it takes to move from your starting point to all of the
+bunnies and to the bulkhead will be given to you in a square matrix
+of integers. Each row will tell you the time it takes to get to the
+start, first bunny, second bunny, ..., last bunny, and the bulkhead
+in that order. The order of the rows follows the same pattern
+(start, each bunny, bulkhead). The bunnies can jump into your arms,
+so picking them up is instantaneous, and arriving at the bulkhead at
+the same time as it seals still allows for a successful, if
+dramatic, escape. (Don't worry, any bunnies you don't pick
+up will be able to escape with you since they no longer have to
+carry the ones you did pick up.) You can revisit different spots if
+you wish, and moving to the bulkhead doesn't mean you have to
+immediately leave -- you can move to and from the bulkhead to pick
 up additional bunnies if time permits.
 
-In addition to spending time traveling between bunnies, some paths 
-interact with the space station's security checkpoints and add 
-time back to the clock. Adding time to the clock will delay the 
-closing of the bulkhead doors, and if the time goes back up to 0 or 
-a positive number after the doors have already closed, it triggers 
-the bulkhead to reopen. Therefore, it might be possible to walk in a 
-circle and keep gaining time: that is, each time a path is 
+In addition to spending time traveling between bunnies, some paths
+interact with the space station's security checkpoints and add
+time back to the clock. Adding time to the clock will delay the
+closing of the bulkhead doors, and if the time goes back up to 0 or
+a positive number after the doors have already closed, it triggers
+the bulkhead to reopen. Therefore, it might be possible to walk in a
+circle and keep gaining time: that is, each time a path is
 traversed, the same amount of time is used or added.
 
-Write a function of the form solution(times, time_limit) to 
-calculate the most bunnies you can pick up and which bunnies they 
-are, while still escaping through the bulkhead before the doors 
-close for good. If there are multiple sets of bunnies of the same 
-size, return the set of bunnies with the lowest worker IDs (as 
-indexes) in sorted order. The bunnies are represented as a sorted 
-list by worker ID, with the first bunny being 0. There are at most 5 
+Write a function of the form solution(times, time_limit) to
+calculate the most bunnies you can pick up and which bunnies they
+are, while still escaping through the bulkhead before the doors
+close for good. If there are multiple sets of bunnies of the same
+size, return the set of bunnies with the lowest worker IDs (as
+indexes) in sorted order. The bunnies are represented as a sorted
+list by worker ID, with the first bunny being 0. There are at most 5
 bunnies, and time_limit is a non-negative integer that is at most
 999.
 [
@@ -51,8 +51,8 @@ bunnies, and time_limit is a non-negative integer that is at most
   [9, 3, 2, 0, -1],  # 3 = Bunny 2
   [9, 3, 2, 2,  0],  # 4 = Bulkhead
 ]
-and a time limit of 1, the five inner array rows designate the 
-starting point, bunny 0, bunny 1, bunny 2, and the bulkhead door 
+and a time limit of 1, the five inner array rows designate the
+starting point, bunny 0, bunny 1, bunny 2, and the bulkhead door
 exit respectively. You could take the path:
 
 Start End Delta Time Status
@@ -63,8 +63,8 @@ Start End Delta Time Status
     4   3     2   -1 Bulkhead closes
     3   4    -1    0 Bulkhead reopens; you and the bunnies exit
 
-With this solution, you would pick up bunnies 1 and 2. This is the 
-best combination for this space station hallway, so the solution is 
+With this solution, you would pick up bunnies 1 and 2. This is the
+best combination for this space station hallway, so the solution is
 [1, 2].
 
 Languages
@@ -76,37 +76,22 @@ To provide a Python solution, edit solution.py
 Test cases
 ==========
 Your code should pass the following test cases.
-Note that it may also be run against hidden test cases not shown 
+Note that it may also be run against hidden test cases not shown
 here.
 
--- Python cases -- 
+-- Python cases --
 Input:
-solution.solution([[0, 2, 2, 2, -1], [9, 0, 2, 2, -1], [9, 3, 0, 2, 
+solution.solution([[0, 2, 2, 2, -1], [9, 0, 2, 2, -1], [9, 3, 0, 2,
 -1], [9, 3, 2, 0, -1], [9, 3, 2, 2, 0]], 1)
 Output:
     [1, 2]
 
 Input:
-solution.solution([[0, 1, 1, 1, 1], [1, 0, 1, 1, 1], [1, 1, 0, 1, 
+solution.solution([[0, 1, 1, 1, 1], [1, 0, 1, 1, 1], [1, 1, 0, 1,
 1], [1, 1, 1, 0, 1], [1, 1, 1, 1, 0]], 3)
 Output:
     [0, 1]
 """
-
-def test():
-    test_cases = [
-        ([[0, 2, 2, 2, -1], 
-          [9, 0, 2, 2, -1], 
-          [9, 3, 0, 2, -1], 
-          [9, 3, 2, 0, -1], 
-          [9, 3, 2, 2, 0]], 1),
-        ([[0, 1, 1, 1, 1], 
-          [1, 0, 1, 1, 1], 
-          [1, 1, 0, 1, 1], 
-          [1, 1, 1, 0, 1], 
-          [1, 1, 1, 1, 0]], 3)]
-    print(solution(*(test_cases)[0]))
-    print(solution(*(test_cases)[1]))
 
 def solution(times: list[list[int]], time_limit: int):
     global TIMES, ROUTES, SIZE, BUNNIES
@@ -121,7 +106,7 @@ def solution(times: list[list[int]], time_limit: int):
 
 def traverse(cur_pos: int, target:int, time_left: int, bunnies: list[int]):
     """
-    recursive function for traversing through nodes, 
+    recursive function for traversing through nodes,
     keeping track of collected bunnies and remaining time
     """
     print(f'{cur_pos = }, {time_left = }')
@@ -137,7 +122,7 @@ def traverse(cur_pos: int, target:int, time_left: int, bunnies: list[int]):
         next_pos = ROUTES[cur_pos][target]
         return traverse(cur_pos=next_pos,
                         target=target,
-                        time_left=time_left - TIMES[cur_pos][next_pos], 
+                        time_left=time_left - TIMES[cur_pos][next_pos],
                         bunnies=bunnies[:])
     if bunnies == BUNNIES: return bunnies
     # traverse to next bunny with lowest id
@@ -147,7 +132,7 @@ def traverse(cur_pos: int, target:int, time_left: int, bunnies: list[int]):
         next_pos = ROUTES[cur_pos][bunny]
         returned = traverse(cur_pos=next_pos,
                             target=bunny,
-                            time_left=time_left - TIMES[cur_pos][next_pos], 
+                            time_left=time_left - TIMES[cur_pos][next_pos],
                             bunnies=bunnies[:])
         # if traversal to current bunny failed, continue with next
         if returned == False: continue
@@ -157,7 +142,7 @@ def traverse(cur_pos: int, target:int, time_left: int, bunnies: list[int]):
         results.append(returned)
     # if at least one bunny list returned successfully:
     # return longest bunny list with lowest ids
-    if len(results) > 0: 
+    if len(results) > 0:
         max_len = max(len(r) for r in results)
         results = (r for r in results if len(r) == max_len)
         return sorted(results)[0]
@@ -174,7 +159,7 @@ def find_shortcuts(time_table: list[list[int]]):
 
     for sc in range(SIZE):
         for x, y in product(range(SIZE), repeat=2):
-            if sc == x or sc == y: continue 
+            if sc == x or sc == y: continue
             if times[x][y] > times[x][sc] + times[sc][y]:
                 times[x][y] = times[x][sc] + times[sc][y]
                 routes[x][y] = routes[x][sc]
@@ -191,4 +176,184 @@ def find_loops(time_table: list[list[int]]):
         for x in range(y + 1):
             if time_table[x][y] + time_table[y][x] < 0: return True
 
-test()
+
+def test(times, time_limit, result):
+    from pprint import pprint
+    print(f'running test with {time_limit = } for matrix: ')
+    pprint(times)
+    print(f'{solution(times, time_limit)} = {result}\n')
+
+test_cases = [
+    [
+        [[0,  1,  5,  5,  2],
+        [10, 0,  2,  6,  10],
+        [10, 10, 0,  1,  5],
+        [10, 10, 10, 0,  1],
+        [10, 10, 10, 10, 0]], 5, [0, 1, 2]
+    ],
+    [
+        [[0, 1, 3, 4, 2],
+        [10, 0, 2, 3, 4],
+        [10, 10, 0, 1, 2],
+        [10, 10, 10, 0, 1],
+        [10, 10, 10, 10, 0]], 4, []
+    ],
+    [
+        [[0, 2, 2, 2, -1],
+        [9, 0, 2, 2, -1],
+        [9, 3, 0, 2, -1],
+        [9, 3, 2, 0, -1],
+        [9, 3, 2, 2, 0]], 1, [1, 2]
+    ],
+    [
+        [[0,  1, 10, 10, 10],
+        [10, 0,  1,  1,  2],
+        [10, 1,  0, 10, 10],
+        [10, 1,  10, 0, 10],
+        [10, 10, 10, 10, 0]], 7, [0, 1, 2]
+    ],
+    [
+        [[0, 1, 1, 1, 1],
+        [1, 0, 1, 1, 1],
+        [1, 1, 0, 1, 1],
+        [1, 1, 1, 0, 1],
+        [1, 1, 1, 1, 0]], 3, [0, 1]
+    ],
+    [
+        [[0, 5, 11, 11, 1],
+        [10, 0, 1, 5, 1],
+        [10, 1, 0, 4, 0],
+        [10, 1, 5, 0, 1],
+        [10, 10, 10, 10, 0]], 10, [0, 1]
+    ],
+    [
+        [[0, 20, 20, 20, -1],
+        [90, 0, 20, 20, 0],
+        [90, 30, 0, 20, 0],
+        [90, 30, 20, 0, 0],
+        [-1, 30, 20, 20, 0]], 0, [0, 1, 2]
+    ],
+    [
+        [[0, 10, 10, 10, 1],
+        [0, 0, 10, 10, 10],
+        [0, 10, 0, 10, 10],
+        [0, 10, 10, 0, 10],
+        [1, 1, 1, 1, 0]], 5, [0, 1]
+    ],
+    [
+        [[2, 2],
+        [2, 2]], 5, []
+    ],
+    [
+        [[0, 10, 10, 1, 10],
+        [10, 0, 10, 10, 1],
+        [10, 1, 0, 10, 10],
+        [10, 10, 1, 0, 10],
+        [1, 10, 10, 10, 0]], 6, [0, 1, 2]
+    ],
+    [
+        [[1, 1, 1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1, 1, 1]], 1, []
+    ],
+    [
+        [[0, 0, 1, 1, 1],
+        [0, 0, 0, 1, 1],
+        [0, 0, 0, 0, 1],
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0]], 0, [0, 1, 2]
+    ],
+    [
+        [[1, 1, 1, 1, 1],
+        [-1, 1, 1, 1, 1],
+        [-1, 1, 1, 1, 1],
+        [-1, 1, 1, 1, 1],
+        [-1, 1, 1, 1, 1]], 1, [0, 1, 2]
+    ],
+    [
+        [[0, 1, 5, 5, 5, 5],
+        [5, 0, 1, 5, 5, 5],
+        [5, 5, 0, 5, 5, -1],
+        [5, 5, 1, 0, 5, 5],
+        [5, 5, 1, 5, 0, 5],
+        [5, 5, 1, 1, 1, 0]], 3, [0, 1, 2, 3]
+    ],
+    [
+        [[0, 1, 5, 5, 5, 5, 5],
+        [5, 0, 1, 5, 5, 5, 5],
+        [5, 5, 0, 5, 5, 0, -1],
+        [5, 5, 1, 0, 5, 5, 5],
+        [5, 5, 1, 5, 0, 5, 5],
+        [5, 5, 0, 5, 5, 0, 0],
+        [5, 5, 1, 1, 1, 0, 0]], 3, [0, 1, 2, 3, 4]
+    ],
+    [
+        [[0,-1, 0, 9, 9, 9, 9, 9],
+        [9, 0, 1, 9, 9, 9, 9, 9],
+        [0, 9, 0, 0, 9, 9, 1, 1],
+        [9, 9, 9, 0, 1, 9, 9, 9],
+        [9, 9, 9, 9, 0,-1, 9, 9],
+        [9, 9, 0, 9, 9, 0, 9, 9],
+        [9, 9,-1, 9, 9, 9, 0, 9],
+        [9, 9, 9, 9, 9, 9, 9, 0]], 1, [0, 1, 2, 3, 4, 5]
+    ],
+    [
+        [[0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0]], 0, [0, 1, 2]
+    ],
+    [
+        [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]],
+        0, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]
+    ],
+    [
+        [[0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+        [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1],
+        [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]],
+        5, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]
+    ],
+]
+
+for tst in test_cases[:4]: test(*tst)
