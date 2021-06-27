@@ -93,60 +93,52 @@ Output:
     [0, 1]
 """
 
-from pprint import pprint
 
-
-def solution(times: list[list[int]], time_limit: int):
+def solution(times, time_limit):
     global TIMES, SIZE, BUNNIES
     SIZE = len(times)
-    TIMES = find_shortcuts(times)
-    print(f'time_table after calculating shortcuts:')
-    pprint(TIMES)
     BUNNIES = list(range(1, SIZE - 1))
+    TIMES = find_shortcuts(times)
     if find_loops(TIMES): return [b - 1 for b in BUNNIES]
-    if TIMES[0][SIZE - 1] > time_limit: return []
     bunnies = traverse(cur_pos=0, time_left=time_limit, bunnies=[])
     if bunnies == False: return []
     return [b - 1 for b in bunnies]
 
-def traverse(cur_pos: int, time_left: int, bunnies: list[int]):
+def traverse(cur_pos, time_left, bunnies):
     """
     recursive function for traversing through nodes,
     keeping track of collected bunnies and remaining time
     """
-    print(f'{cur_pos = }, {time_left = }')
-    # if if time to bulkhead > time left: return false
+    # if time to bulkhead > time left: return false
     if TIMES[cur_pos][SIZE - 1] > time_left: return False
     # if all bunnies collected and time to bulkhead <= time left: done (return bunnies)
     if cur_pos in BUNNIES and cur_pos not in bunnies:
         bunnies.append(cur_pos)
         bunnies.sort()
-        print(f'{bunnies = }')
-    # if current position is a shortcut node immediately traverse to next node
     if bunnies == BUNNIES: return bunnies
     # traverse to next bunny with lowest id
     missing_bunnies = [b for b in BUNNIES if b not in bunnies]
-    results = []
+    search_results = []
     for bunny in missing_bunnies:
         search_result = traverse(cur_pos=bunny,
-                            time_left=time_left - TIMES[cur_pos][bunny],
-                            bunnies=bunnies[:])
+                                 time_left=time_left - TIMES[cur_pos][bunny],
+                                 bunnies=bunnies[:])
         # if traversal to current bunny failed, continue with next
         if search_result == False: continue
         # if all bunnies collected => done
         if search_result == BUNNIES: return search_result
         # else remember returned bunny list
-        results.append(search_result)
+        search_results.append(search_result)
     # if at least one bunny list returned successfully:
     # return longest bunny list with lowest ids
-    if len(results) > 0:
-        max_len = max(len(r) for r in results)
-        results = (r for r in results if len(r) == max_len)
-        return sorted(results)[0]
+    if len(search_results) > 0:
+        max_len = max(len(r) for r in search_results)
+        search_results = (r for r in search_results if len(r) == max_len)
+        return sorted(search_results)[0]
     # if all bunnies returned false: return current bunny list
     return bunnies
 
-def find_shortcuts(time_table: list[list[int]]):
+def find_shortcuts(time_table):
     """check if there are shorter paths between 2 nodes going through other nodes"""
     from itertools import product
     # table containing shortest times between nodes
@@ -159,189 +151,8 @@ def find_shortcuts(time_table: list[list[int]]):
                 times[x][y] = times[x][sc] + times[sc][y]
     return times
 
-def find_loops(time_table: list[list[int]]):
+def find_loops(time_table):
     """check if there are any positive feedback loops, allowing for infinite time"""
     for y in range(len(time_table)):
         for x in range(y + 1):
             if time_table[x][y] + time_table[y][x] < 0: return True
-
-
-def test(times, time_limit, result):
-    print(f'running test with {time_limit = } for matrix: ')
-    pprint(times)
-    print(f'{solution(times, time_limit)} = {result}\n')
-
-test_cases = [
-    [
-        [[0,  1,  5,  5,  2],
-        [10, 0,  2,  6,  10],
-        [10, 10, 0,  1,  5],
-        [10, 10, 10, 0,  1],
-        [10, 10, 10, 10, 0]], 5, [0, 1, 2]
-    ],
-    [
-        [[0, 1, 3, 4, 2],
-        [10, 0, 2, 3, 4],
-        [10, 10, 0, 1, 2],
-        [10, 10, 10, 0, 1],
-        [10, 10, 10, 10, 0]], 4, []
-    ],
-    [
-        [[0, 2, 2, 2, -1],
-        [9, 0, 2, 2, -1],
-        [9, 3, 0, 2, -1],
-        [9, 3, 2, 0, -1],
-        [9, 3, 2, 2, 0]], 1, [1, 2]
-    ],
-    [
-        [[0,  1, 10, 10, 10],
-        [10, 0,  1,  1,  2],
-        [10, 1,  0, 10, 10],
-        [10, 1,  10, 0, 10],
-        [10, 10, 10, 10, 0]], 7, [0, 1, 2]
-    ],
-    [
-        [[0, 1, 1, 1, 1],
-        [1, 0, 1, 1, 1],
-        [1, 1, 0, 1, 1],
-        [1, 1, 1, 0, 1],
-        [1, 1, 1, 1, 0]], 3, [0, 1]
-    ],
-    [
-        [[0, 5, 11, 11, 1],
-        [10, 0, 1, 5, 1],
-        [10, 1, 0, 4, 0],
-        [10, 1, 5, 0, 1],
-        [10, 10, 10, 10, 0]], 10, [0, 1]
-    ],
-    [
-        [[0, 20, 20, 20, -1],
-        [90, 0, 20, 20, 0],
-        [90, 30, 0, 20, 0],
-        [90, 30, 20, 0, 0],
-        [-1, 30, 20, 20, 0]], 0, [0, 1, 2]
-    ],
-    [
-        [[0, 10, 10, 10, 1],
-        [0, 0, 10, 10, 10],
-        [0, 10, 0, 10, 10],
-        [0, 10, 10, 0, 10],
-        [1, 1, 1, 1, 0]], 5, [0, 1]
-    ],
-    [
-        [[2, 2],
-        [2, 2]], 5, []
-    ],
-    [
-        [[0, 10, 10, 1, 10],
-        [10, 0, 10, 10, 1],
-        [10, 1, 0, 10, 10],
-        [10, 10, 1, 0, 10],
-        [1, 10, 10, 10, 0]], 6, [0, 1, 2]
-    ],
-    [
-        [[1, 1, 1, 1, 1, 1, 1],
-        [1, 1, 1, 1, 1, 1, 1],
-        [1, 1, 1, 1, 1, 1, 1],
-        [1, 1, 1, 1, 1, 1, 1],
-        [1, 1, 1, 1, 1, 1, 1],
-        [1, 1, 1, 1, 1, 1, 1],
-        [1, 1, 1, 1, 1, 1, 1]], 1, []
-    ],
-    [
-        [[0, 0, 1, 1, 1],
-        [0, 0, 0, 1, 1],
-        [0, 0, 0, 0, 1],
-        [0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0]], 0, [0, 1, 2]
-    ],
-    [
-        [[1, 1, 1, 1, 1],
-        [-1, 1, 1, 1, 1],
-        [-1, 1, 1, 1, 1],
-        [-1, 1, 1, 1, 1],
-        [-1, 1, 1, 1, 1]], 1, [0, 1, 2]
-    ],
-    [
-        [[0, 1, 5, 5, 5, 5],
-        [5, 0, 1, 5, 5, 5],
-        [5, 5, 0, 5, 5, -1],
-        [5, 5, 1, 0, 5, 5],
-        [5, 5, 1, 5, 0, 5],
-        [5, 5, 1, 1, 1, 0]], 3, [0, 1, 2, 3]
-    ],
-    [
-        [[0, 1, 5, 5, 5, 5, 5],
-        [5, 0, 1, 5, 5, 5, 5],
-        [5, 5, 0, 5, 5, 0, -1],
-        [5, 5, 1, 0, 5, 5, 5],
-        [5, 5, 1, 5, 0, 5, 5],
-        [5, 5, 0, 5, 5, 0, 0],
-        [5, 5, 1, 1, 1, 0, 0]], 3, [0, 1, 2, 3, 4]
-    ],
-    [
-        [[0,-1, 0, 9, 9, 9, 9, 9],
-        [9, 0, 1, 9, 9, 9, 9, 9],
-        [0, 9, 0, 0, 9, 9, 1, 1],
-        [9, 9, 9, 0, 1, 9, 9, 9],
-        [9, 9, 9, 9, 0,-1, 9, 9],
-        [9, 9, 0, 9, 9, 0, 9, 9],
-        [9, 9,-1, 9, 9, 9, 0, 9],
-        [9, 9, 9, 9, 9, 9, 9, 0]], 1, [0, 1, 2, 3, 4, 5]
-    ],
-    [
-        [[0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0]], 0, [0, 1, 2]
-    ],
-    [
-        [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]],
-        0, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]
-    ],
-    [
-        [[0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-        [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-        [1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-        [0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1],
-        [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]],
-        5, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]
-    ],
-]
-
-for tst in test_cases[:-2]: test(*tst)
