@@ -101,24 +101,32 @@ def test():
                      [9, 3, 2, 2, 0]], 1)
 
 def solution(times: list[list[int]], time_limit: int):
-    global TIME_TABLE, ROUTES, NUM_NODES, BUNNIES
-    NUM_NODES = len(times)
-    TIME_TABLE, ROUTES = find_shortcuts(times)
-    BUNNIES = list(range(1, NUM_NODES - 1))
-    if find_loops(TIME_TABLE): return [b - 1 for b in BUNNIES]
-    if TIME_TABLE[0][NUM_NODES - 1] > time_limit: return []
-    returned = traverse(cur_pos=0, time_left=time_limit, bunnies=[])
+    global TIMES, ROUTES, SIZE, BUNNIES
+    SIZE = len(times)
+    TIMES, ROUTES = find_shortcuts(times)
+    BUNNIES = list(range(1, SIZE - 1))
+    if find_loops(TIMES): return [b - 1 for b in BUNNIES]
+    if TIMES[0][SIZE - 1] > time_limit: return []
+    returned = traverse(cur_pos=0, target=0, time_left=time_limit, bunnies=[])
     if returned == False: return []
     return [b - 1 for b in BUNNIES]
 
-def traverse(cur_pos: int, time_left: int, bunnies: list[int]):
+def traverse(cur_pos: int, target:int, time_left: int, bunnies: list[int]):
+    print(f'{cur_pos = }, {time_left = }')
     # if if time to bulkhead > time left: return false
-    if TIME_TABLE[cur_pos][NUM_NODES - 1] > time_left: return False
+    if TIMES[cur_pos][SIZE - 1] > time_left: return False
     # if all bunnies collected and time to bulkhead <= time left: done (return bunnies)
     if cur_pos in BUNNIES and cur_pos not in bunnies:
         bunnies.append(cur_pos)
         bunnies.sort()
         print(f'{bunnies = }')
+    # if current position is a shortcut node immediately traverse to next node
+    if cur_pos != target:
+        next_pos = ROUTES[cur_pos][target]
+        return traverse(cur_pos=next_pos,
+                        target=target,
+                        time_left=time_left - TIMES[cur_pos][next_pos], 
+                        bunnies=bunnies)
     if bunnies == BUNNIES: return bunnies
 
     # traverse to next bunny with lowest id
@@ -127,7 +135,8 @@ def traverse(cur_pos: int, time_left: int, bunnies: list[int]):
     for bunny in missing_bunnies:
         next_pos = ROUTES[cur_pos][bunny]
         returned = traverse(cur_pos=next_pos,
-                            time_left=time_left - TIME_TABLE[cur_pos][next_pos], 
+                            target=bunny,
+                            time_left=time_left - TIMES[cur_pos][next_pos], 
                             bunnies=bunnies)
         # if traversal to current bunny failed, continue with next
         if returned == False: continue
@@ -147,11 +156,11 @@ def find_shortcuts(time_table: list[list[int]]):
     # table containing shortest times between nodes
     times = [[col for col in row] for row in time_table]
     # table containing each path with the shortest time
-    routes = [[dest for dest in range(NUM_NODES)] for _ in range(NUM_NODES)]
+    routes = [[dest for dest in range(SIZE)] for _ in range(SIZE)]
 
-    for sc in range(NUM_NODES):
-        for x, y in product(range(NUM_NODES), repeat=2):
-            if sc == x or sc == y: continue
+    for sc in range(SIZE):
+        for x, y in product(range(SIZE), repeat=2):
+            if sc == x or sc == y: continue 
             if times[x][y] > times[x][sc] + times[sc][y]:
                 times[x][y] = times[x][sc] + times[sc][y]
                 routes[x][y] = routes[x][sc]
