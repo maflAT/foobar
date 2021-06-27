@@ -94,11 +94,19 @@ Output:
 """
 
 def test():
-    return solution([[0, 2, 2, 2, -1], 
-                     [9, 0, 2, 2, -1], 
-                     [9, 3, 0, 2, -1], 
-                     [9, 3, 2, 0, -1], 
-                     [9, 3, 2, 2, 0]], 1)
+    test_cases = [
+        ([[0, 2, 2, 2, -1], 
+          [9, 0, 2, 2, -1], 
+          [9, 3, 0, 2, -1], 
+          [9, 3, 2, 0, -1], 
+          [9, 3, 2, 2, 0]], 1),
+        ([[0, 1, 1, 1, 1], 
+          [1, 0, 1, 1, 1], 
+          [1, 1, 0, 1, 1], 
+          [1, 1, 1, 0, 1], 
+          [1, 1, 1, 1, 0]], 3)]
+    print(solution(*(test_cases)[0]))
+    print(solution(*(test_cases)[1]))
 
 def solution(times: list[list[int]], time_limit: int):
     global TIMES, ROUTES, SIZE, BUNNIES
@@ -107,11 +115,15 @@ def solution(times: list[list[int]], time_limit: int):
     BUNNIES = list(range(1, SIZE - 1))
     if find_loops(TIMES): return [b - 1 for b in BUNNIES]
     if TIMES[0][SIZE - 1] > time_limit: return []
-    returned = traverse(cur_pos=0, target=0, time_left=time_limit, bunnies=[])
-    if returned == False: return []
-    return [b - 1 for b in BUNNIES]
+    bunnies = traverse(cur_pos=0, target=0, time_left=time_limit, bunnies=[])
+    if bunnies == False: return []
+    return [b - 1 for b in bunnies]
 
 def traverse(cur_pos: int, target:int, time_left: int, bunnies: list[int]):
+    """
+    recursive function for traversing through nodes, 
+    keeping track of collected bunnies and remaining time
+    """
     print(f'{cur_pos = }, {time_left = }')
     # if if time to bulkhead > time left: return false
     if TIMES[cur_pos][SIZE - 1] > time_left: return False
@@ -126,9 +138,8 @@ def traverse(cur_pos: int, target:int, time_left: int, bunnies: list[int]):
         return traverse(cur_pos=next_pos,
                         target=target,
                         time_left=time_left - TIMES[cur_pos][next_pos], 
-                        bunnies=bunnies)
+                        bunnies=bunnies[:])
     if bunnies == BUNNIES: return bunnies
-
     # traverse to next bunny with lowest id
     missing_bunnies = [b for b in BUNNIES if b not in bunnies]
     results = []
@@ -137,7 +148,7 @@ def traverse(cur_pos: int, target:int, time_left: int, bunnies: list[int]):
         returned = traverse(cur_pos=next_pos,
                             target=bunny,
                             time_left=time_left - TIMES[cur_pos][next_pos], 
-                            bunnies=bunnies)
+                            bunnies=bunnies[:])
         # if traversal to current bunny failed, continue with next
         if returned == False: continue
         # if all bunnies collected => done
@@ -146,7 +157,10 @@ def traverse(cur_pos: int, target:int, time_left: int, bunnies: list[int]):
         results.append(returned)
     # if at least one bunny list returned successfully:
     # return longest bunny list with lowest ids
-    if len(results) > 0: return sorted(results, key=len)[-1]
+    if len(results) > 0: 
+        max_len = max(len(r) for r in results)
+        results = (r for r in results if len(r) == max_len)
+        return sorted(results)[0]
     # if all bunnies returned false: return current bunny list
     return bunnies
 
@@ -172,9 +186,9 @@ def find_shortcuts(time_table: list[list[int]]):
     return times, routes
 
 def find_loops(time_table: list[list[int]]):
+    """check if there are any positive feedback loops, allowing for infinite time"""
     for y in range(len(time_table)):
         for x in range(y + 1):
             if time_table[x][y] + time_table[y][x] < 0: return True
-
 
 test()
